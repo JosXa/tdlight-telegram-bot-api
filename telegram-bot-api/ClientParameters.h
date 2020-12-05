@@ -34,6 +34,7 @@ struct SharedData {
   // not thread-safe
   td::ListNode query_list_;
   td::unique_ptr<td::KeyValueSyncInterface> webhook_db_;
+  td::unique_ptr<td::KeyValueSyncInterface> user_db_;
   td::unique_ptr<td::TQueue> tqueue_;
 
   double unix_time_difference_{-1e100};
@@ -58,6 +59,7 @@ struct ClientParameters {
   bool allow_http_ = false;
   bool use_relative_path_ = false;
   bool no_file_limit_ = true;
+  bool allow_users_ = false;
 
   td::int32 api_id_ = 0;
   td::string api_hash_;
@@ -66,7 +68,7 @@ struct ClientParameters {
   td::IPAddress webhook_proxy_ip_address_;
 
   td::uint32 max_batch_operations = 10000;
-  double start_timestamp_ = 0;
+  double start_time_ = 0;
 
   td::ActorId<td::GetHostByNameActor> get_host_by_name_actor_id_;
 

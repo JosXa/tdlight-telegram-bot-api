@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
   auto shared_data = std::make_shared<SharedData>();
   auto parameters = std::make_unique<ClientParameters>();
   parameters->shared_data_ = shared_data;
-  parameters->start_timestamp_ = start_time;
+  parameters->start_time_ = start_time;
   auto net_query_stats = td::create_net_query_stats();
   parameters->net_query_stats_ = net_query_stats;
 
@@ -172,10 +172,10 @@ int main(int argc, char *argv[]) {
   options.add_option('h', "help", "display this help text and exit", [&] { need_print_usage = true; });
   options.add_option('\0', "local", "allow the Bot API server to serve local requests and disables the file limits",
                      [&] { parameters->local_mode_ = true; });
-  options.add_option('\0', "no-file-limit", "disable the file limits",
-		             [&] { parameters->no_file_limit_ = true; });
+  options.add_option('\0', "no-file-limit", "disable the file limits", [&] { parameters->no_file_limit_ = true; });
   options.add_option('\0', "insecure", "allow the Bot API to send request via insecure HTTP", [&] { parameters->allow_http_ = true; });
   options.add_option('\0', "relative", "use relative file path in local mode", [&] { parameters->use_relative_path_ = true; });
+  options.add_option('\0', "allow-users", "allow user accounts to use the API", [&] { parameters->allow_users_ = true; });
 
   options.add_checked_option(
       '\0', "api-id",
@@ -472,6 +472,9 @@ int main(int argc, char *argv[]) {
 
     double now = td::Time::now();
     if (now >= next_cron_time) {
+      if (now >= next_cron_time + 1.0) {
+        next_cron_time = now;
+      }
       next_cron_time += 1.0;
       ServerCpuStat::update(now);
     }
