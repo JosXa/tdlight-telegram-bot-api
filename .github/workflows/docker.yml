@@ -195,12 +195,12 @@ jobs:
           --amend ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxamd64
           docker manifest push ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
       - name: CapRover Image Deploy
-        uses: floms/action-caprover@v1
+        uses: stardustventures/caprover-deploy@v2
         with:
-          host: 'https://captain.tgapi.me'
+          server: 'https://captain.tgapi.me'
           password: '${{ secrets.CAPROVER_PASSWORD }}'
-          app: 'user'
-          image: ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
+          appname: 'user'
+          image: josxa/tdlightbotapi:latest
       - name: Generate Swagger UI
         uses: Legion2/swagger-ui-action@v1
         with:
