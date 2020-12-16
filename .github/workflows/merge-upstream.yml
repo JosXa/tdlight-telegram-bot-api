@@ -21,11 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${{ inputs.merge_into_ref }}          # set the branch to merge to
+          ref: ${{ variables.merge_into_ref }}          # set the branch to merge to
           fetch-depth: 0 
       - name: Merge Upstream
         uses: exions/merge-upstream@v1
         with:
           upstream: code1mountain/tdlight-telegram-bot-api
-          upstream-branch: ${{ inputs.upstream_ref }}
+          upstream-branch: ${{ upstream_ref }}
           branch: upstream
