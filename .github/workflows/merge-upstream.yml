@@ -4,6 +4,15 @@ on:
     - cron: '0 * * * *'
     # every hour
   workflow_dispatch:
+    inputs:
+      upstream_ref:
+        description: 'Upstream ref'
+        required: true
+        default: 'Mona the Octocat'
+      merge_into_ref:
+        description: 'Ref to merge into'
+        required: false
+        default: 'master'
 
 jobs:
   merge-upstream:
@@ -12,11 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: master             # set the branch to merge to
+          ref: ${{ inputs.merge_into_ref }}          # set the branch to merge to
           fetch-depth: 0 
       - name: Merge Upstream
         uses: exions/merge-upstream@v1
         with:
           upstream: code1mountain/tdlight-telegram-bot-api
-          upstream-branch: user-methods
+          upstream-branch: ${{ inputs.upstream_ref }}
           branch: upstream
