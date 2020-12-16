@@ -198,13 +198,13 @@ jobs:
         uses: floms/action-caprover@v1
         with:
           # CapRover admin panel URL. Ex. https://captain.root.domain.com
-          server: 'https://captain.tgapi.me'
+          server: https://captain.tgapi.me
           # CapRover admin password. Use $\{{ secrets.CAPROVER_PASSWORD }} for better security.
-          password: '${{ secrets.CAPROVER_PASSWORD }}'
+          password: ${{ secrets.CAPROVER_PASSWORD }}
           # Application name on the CapRover server. Must exists.
-          appname: 'user'
+          appname: user
           # Container image registry url
-          image: '${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}'
+          image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
       
 
     
