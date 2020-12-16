@@ -200,7 +200,7 @@ jobs:
           host: https://captain.tgapi.me
           password: ${{ secrets.CAPROVER_PASSWORD }}
           app: user
-          image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
+          image: ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
       
 
     
