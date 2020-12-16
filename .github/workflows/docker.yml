@@ -197,8 +197,8 @@ jobs:
       - name: CapRover Image Deploy
         uses: floms/action-caprover@v1
         with:
-          host: https://captain.tgapi.me
-          password: ${{ secrets.CAPROVER_PASSWORD }}
+          host: 'https://captain.tgapi.me'
+          password: '${{ secrets.CAPROVER_PASSWORD }}'
           app: 'user'
           image: ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
       - name: Generate Swagger UI
