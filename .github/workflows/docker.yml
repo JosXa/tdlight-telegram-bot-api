@@ -191,7 +191,7 @@ jobs:
           # Tag images as VERSION (like 'latest')
           docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxamd64 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxamd64
 
-          docker manifest create ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
+          docker manifest create ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }} \
           --amend ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxamd64
           docker manifest push ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
 
