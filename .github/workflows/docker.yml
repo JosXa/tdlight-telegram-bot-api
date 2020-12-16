@@ -206,10 +206,11 @@ jobs:
           echo ${{ secrets.CAPTAIN_DASHBOARD_URL }} 
           echo ${{ secrets.CAPROVER_PASSWORD }}
           echo ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
+      
       - name: CapRover Image Deploy
         # You may pin to the exact commit or the version.
         # uses: stardustventures/caprover-deploy@00941ba464205be71bdf44229b4d337e72fe9898
-        uses: stardustventures/caprover-deploy@v2
+        uses: floms/action-caprover@v1
         with:
           # CapRover admin panel URL. Ex. https://captain.root.domain.com
           server: ${{ secrets.CAPTAIN_DASHBOARD_URL }} 
