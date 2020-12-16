@@ -2,9 +2,11 @@ name: Docker multi-arch build and push
 
 on:
   push:
-  pull_request:
+    branches:
+      - main
+      - master
+      - release
   workflow_dispatch:
-
 
 jobs:
   build:
@@ -30,13 +32,13 @@ jobs:
 
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-        
+
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-        
+
           # Use Docker `latest` tag convention
           [ "$VERSION" == "master" ] && VERSION=latest
- 
+
           # Convert IMAGE_TAG, HASH_VERSION and VERSION to lowercase (repository name must be lowercase)
           IMAGE_TAG=$(echo "$IMAGE_TAG" | awk '{print tolower($0)}')
           IMAGE_TAG_DH=$(echo "$IMAGE_TAG_DH" | awk '{print tolower($0)}')
@@ -136,7 +138,7 @@ jobs:
           name: image_${{ env.SAFE_ARCH }}
           path: ${{ env.SAFE_ARCH }}.tar
 
-  push-manifest:
+  push-and-deploy:
     name: Create and push multi-arch Docker manifest
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'pull_request' }}
@@ -195,20 +197,17 @@ jobs:
       - name: CapRover Image Deploy
         uses: stardustventures/caprover-deploy@v2
         with:
-          server: 'https://captain.tgapi.me'
-          password: '${{ secrets.CAPROVER_PASSWORD }}'
-          appname: 'user'
+          server: "https://captain.tgapi.me"
+          password: "${{ secrets.CAPROVER_PASSWORD }}"
+          appname: "user"
           image: josxa/tdlightbotapi:latest
-      - name: Generate Swagger UI
-        uses: Legion2/swagger-ui-action@v1
-        with:
-          output: swagger-ui
-          spec-file: openapi.json
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: swagger-ui  
-      
-
-    
+      # - name: Generate Swagger UI
+      #   uses: Legion2/swagger-ui-action@v1
+      #   with:
+      #     output: swagger-ui
+      #     spec-file: openapi.json
+      # - name: Deploy to GitHub Pages
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: swagger-ui
