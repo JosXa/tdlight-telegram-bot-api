@@ -197,13 +197,9 @@ jobs:
       - name: CapRover Image Deploy
         uses: floms/action-caprover@v1
         with:
-          # CapRover admin panel URL. Ex. https://captain.root.domain.com
-          server: https://captain.tgapi.me
-          # CapRover admin password. Use $\{{ secrets.CAPROVER_PASSWORD }} for better security.
+          host: https://captain.tgapi.me
           password: ${{ secrets.CAPROVER_PASSWORD }}
-          # Application name on the CapRover server. Must exists.
-          appname: user
-          # Container image registry url
+          app: user
           image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
       
 
