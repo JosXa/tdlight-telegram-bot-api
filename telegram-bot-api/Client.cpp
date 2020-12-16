@@ -139,6 +139,9 @@ void Client::fail_query_with_error(PromisedQueryPtr query, int32 error_code, Sli
     case 403:
       prefix = Slice("Forbidden");
       break;
+    case 405:
+      prefix = Slice("Method Not Allowed");
+      break;
     case 500:
       prefix = Slice("Internal Server Error");
       break;
@@ -188,14 +191,14 @@ Client::Client(td::ActorShared<> parent, const td::string &bot_token, bool is_us
   CHECK(is_inited);
 }
 
-Client::Client(td::ActorShared<> parent, const td::string &bot_token, const td::string &phone_number, bool is_test_dc,
-               int64 tqueue_id, std::shared_ptr<const ClientParameters> parameters,
+Client::Client(td::ActorShared<> parent, const td::string &bot_token, const td::string &phone_number, bool is_user,
+               bool is_test_dc, int64 tqueue_id, std::shared_ptr<const ClientParameters> parameters,
                td::ActorId<BotStatActor> stat_actor)
     : parent_(std::move(parent))
     , bot_token_(bot_token)
     , bot_token_id_("<unknown>")
     , phone_number_(phone_number)
-    , is_user_(true)
+    , is_user_(is_user)
     , is_test_dc_(is_test_dc)
     , tqueue_id_(tqueue_id)
     , parameters_(std::move(parameters))
@@ -292,6 +295,7 @@ bool Client::init_methods() {
   methods_.emplace("deletemessages", &Client::process_delete_messages_query);
   methods_.emplace("togglegroupinvites", &Client::process_toggle_group_invites_query);
   methods_.emplace("ping", &Client::process_ping_query);
+  methods_.emplace("getmemorystats", &Client::process_get_memory_stats_query);
 
 
   return true;
@@ -2373,7 +2377,7 @@ class Client::TdOnAuthorizationQueryCallback : public TdQueryCallback {
                  std::move(query_));
       LOG(WARNING) << "Logging out due to " << td::oneline(to_string(error));
       client_->log_out();
-    } else if (was_ready) {
+    } else {
       answer_query(td::JsonTrue(), std::move(query_));
       client_->on_update_authorization_state();
     }
@@ -3319,6 +3323,26 @@ class Client::TdOnPingCallback : public TdQueryCallback {
 
     auto seconds_ = move_object_as<td_api::seconds>(result);
     answer_query(td::VirtuallyJsonableString(std::to_string(seconds_->seconds_)), std::move(query_));
+  }
+
+ private:
+  PromisedQueryPtr query_;
+};
+
+class Client::TdOnGetMemoryStatisticsCallback : public TdQueryCallback {
+ public:
+  explicit TdOnGetMemoryStatisticsCallback(PromisedQueryPtr query)
+      : query_(std::move(query)) {
+  }
+
+  void on_result(object_ptr<td_api::Object> result) override {
+    if (result->get_id() == td_api::error::ID) {
+      return fail_query_with_error(std::move(query_), move_object_as<td_api::error>(result));
+    }
+
+    auto res = move_object_as<td_api::memoryStatistics>(result);
+
+    answer_query(td::JsonRaw(res->statistics_), std::move(query_));
   }
 
  private:
@@ -4417,6 +4441,7 @@ void Client::on_closed() {
 
   if (logging_out_) {
     parameters_->shared_data_->webhook_db_->erase(bot_token_with_dc_);
+    parameters_->shared_data_->user_db_->erase(bot_token_with_dc_);
 
     class RmWorker : public td::Actor {
      public:
@@ -7673,8 +7698,13 @@ td::Status Client::process_ping_query(PromisedQueryPtr &query) {
   return Status::OK();
 }
 
+td::Status Client::process_get_memory_stats_query(PromisedQueryPtr &query) {
+  send_request(make_object<td_api::getMemoryStatistics>(),
+               std::make_unique<TdOnGetMemoryStatisticsCallback>(std::move(query)));
+  return Status::OK();
+}
 //end custom methods impl
-//start costom auth methods impl
+//start custom auth methods impl
 
 void Client::process_authcode_query(PromisedQueryPtr &query) {
   auto code = query->arg("code");

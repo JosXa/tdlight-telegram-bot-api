@@ -1,5 +1,5 @@
 //
-// Copyright Aliaksei Levin (levlam@telegram.org), Arseny Smirnov (arseny30@gmail.com) 2014-2020
+// Copyright Aliaksei Levin (levlam@telegram.org), Arseny Smirnov (arseny30@gmail.com) 2014-2020, Luckydonald (tdlight-telegram-bot-api+code@luckydonald.de) 2020
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -81,16 +81,16 @@ void ClientManager::send(PromisedQueryPtr query) {
     token += "/test";
   }
 
+  auto bot_token_with_dc = PSTRING() << query->token() << (query->is_test_dc() ? ":T" : "");
+  if (parameters_->shared_data_->user_db_->isset(bot_token_with_dc) != query->is_user()) {
+    return fail_query(400, "Bad Request: Please use the correct api endpoint for bots or users", std::move(query));
+  }
+
   auto id_it = token_to_id_.find(token);
   if (id_it == token_to_id_.end()) {
     if (!check_flood_limits(query)) {
       return;
     }
-    auto bot_token_with_dc = PSTRING() << query->token() << (query->is_test_dc() ? ":T" : "");
-    if (parameters_->shared_data_->user_db_->get(bot_token_with_dc).empty() == query->is_user()) {
-      return fail_query(400, "Bad Request: Please use the correct api endpoint for bots or users", std::move(query));
-    }
-
     auto id = clients_.create(ClientInfo{BotStatActor(stat_.actor_id(&stat_)), token, td::ActorOwn<Client>()});
     auto *client_info = clients_.get(id);
     auto stat_actor = client_info->stat_.actor_id(&client_info->stat_);
@@ -147,7 +147,7 @@ void ClientManager::user_login(PromisedQueryPtr query) {
   auto stat_actor = client_info->stat_.actor_id(&client_info->stat_);
   auto client_id = td::create_actor<Client>(
       PSLICE() << "Client/" << user_token, actor_shared(this, id), user_token, td::to_string(phone_number),
-      query->is_test_dc(), get_tqueue_id(token_hash, query->is_test_dc()), parameters_, std::move(stat_actor));
+      true, query->is_test_dc(), get_tqueue_id(token_hash, query->is_test_dc()), parameters_, std::move(stat_actor));
 
   clients_.get(id)->client_ = std::move(client_id);
   auto id_it = token_to_id_.end();
@@ -289,9 +289,17 @@ void ClientManager::get_stats(td::PromiseActor<td::BufferSlice> promise,
     sb << "\n";
     sb << "id\t" << bot_info.id_ << "\n";
     sb << "uptime\t" << now - bot_info.start_time_ << "\n";
-    sb << "token\t" << bot_info.token_ << "\n";
+    if (!parameters_->stats_hide_sensible_data_) {
+      sb << "token\t" << bot_info.token_ << "\n";
+    }
     sb << "username\t" << bot_info.username_ << "\n";
-    sb << "webhook\t" << bot_info.webhook_ << "\n";
+    if (!parameters_->stats_hide_sensible_data_) {
+      sb << "webhook\t" << bot_info.webhook_ << "\n";
+    } else if (bot_info.webhook_.empty()) {
+      sb << "webhook disabled" << "\n";
+    } else {
+      sb << "webhook enabled" << "\n";
+    }
     sb << "has_custom_certificate\t" << bot_info.has_webhook_certificate_ << "\n";
     sb << "head_update_id\t" << bot_info.head_update_id_ << "\n";
     sb << "tail_update_id\t" << bot_info.tail_update_id_ << "\n";
@@ -378,7 +386,7 @@ void ClientManager::start_up() {
       continue;
     }
 
-    auto query = get_webhook_restore_query(key_value.first, user_db.get(key_value.first).empty(), key_value.second, parameters_->shared_data_);
+    auto query = get_webhook_restore_query(key_value.first, user_db.isset(key_value.first), key_value.second, parameters_->shared_data_);
     send_closure_later(actor_id(this), &ClientManager::send, std::move(query));
   }
 

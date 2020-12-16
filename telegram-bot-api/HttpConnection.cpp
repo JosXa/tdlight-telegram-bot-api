@@ -93,6 +93,10 @@ void HttpConnection::send_response(int http_status_code, td::BufferSlice &&conte
   if (retry_after > 0) {
     hc.add_header("Retry-After", PSLICE() << retry_after);
   }
+  if (shared_data_->SEND_CORS_HEADERS) {
+    hc.add_header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, PATCH, OPTIONS");
+    hc.add_header("Access-Control-Allow-Headers", "Content-Type");
+  }
   hc.set_content_size(content.size());
 
   auto r_header = hc.finish();

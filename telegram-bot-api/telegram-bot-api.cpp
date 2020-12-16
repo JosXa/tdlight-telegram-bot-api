@@ -180,6 +180,10 @@ int main(int argc, char *argv[]) {
   options.add_option('\0', "allow-users-registration", "allow user accounts to be registered on the API",
                      [&] { parameters->allow_users_registration_ = true; });
 
+  options.add_option('\0', "stats-hide-sensible-data", "in the stats hide sensible data like bot token and webhook url", [&] { parameters->stats_hide_sensible_data_ = true; });
+  options.add_option('\0', "cors-headers",
+                     "send CORS-Headers with the response, necessary to try the swagger documentation in the browser",
+                     [&] { shared_data->SEND_CORS_HEADERS = true; });
   options.add_checked_option(
       '\0', "api-id",
       "application identifier for Telegram API access, which can be obtained at https://my.telegram.org (defaults to "

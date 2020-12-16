@@ -38,6 +38,7 @@ struct SharedData {
   td::unique_ptr<td::TQueue> tqueue_;
 
   double unix_time_difference_{-1e100};
+  bool SEND_CORS_HEADERS = false;
 
   static constexpr size_t TQUEUE_EVENT_BUFFER_SIZE = 1000;
   td::TQueue::Event event_buffer_[TQUEUE_EVENT_BUFFER_SIZE];
@@ -61,6 +62,7 @@ struct ClientParameters {
   bool no_file_limit_ = true;
   bool allow_users_ = false;
   bool allow_users_registration_ = false;
+  bool stats_hide_sensible_data_ = false;
 
   td::int32 api_id_ = 0;
   td::string api_hash_;
