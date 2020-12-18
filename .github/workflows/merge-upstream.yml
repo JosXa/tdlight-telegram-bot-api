@@ -8,7 +8,7 @@ on:
       upstream_ref:
         description: 'Upstream ref'
         required: true
-        default: 'upstream/master'
+        default: 'upstream/user-methods'
       merge_into_ref:
         description: 'Ref to merge into'
         required: false
