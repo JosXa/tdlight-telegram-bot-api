@@ -27,3 +27,5 @@ jobs:
           owner: ${{ github.event.inputs.upstream_owner }}
           base: ${{ github.event.inputs.upstream_branch }}
           head: ${{ github.event.inputs.branch }}
+          auto_approve: true
+          personal_token: ${{ secrets.GH_PERSONAL_TOKEN }}  
