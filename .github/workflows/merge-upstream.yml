@@ -19,6 +19,7 @@ on:
 
 jobs:
   sync:
+    # Could also try https://github.com/marketplace/actions/fork-sync-with-upstream
     runs-on: ubuntu-latest
     steps:
       - uses: tgymnich/fork-sync@v1.2
