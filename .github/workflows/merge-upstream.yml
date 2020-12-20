@@ -4,7 +4,7 @@ on:
     - cron: '0 0,6,12,18 * * *'
   workflow_dispatch:
     inputs:
-      upstream_ref:
+      upstream_branch:
         description: 'Upstream ref'
         required: true
         default: 'upstream/user-methods'
@@ -26,5 +26,5 @@ jobs:
         uses: exions/merge-upstream@v1
         with:
           upstream: code1mountain/tdlight-telegram-bot-api
-          upstream-branch: ${{ github.event.inputs.upstream_ref }}
+          upstream-branch: ${{ github.event.inputs.upstream_branch }}
           branch: upstream
