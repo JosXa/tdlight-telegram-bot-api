@@ -28,4 +28,5 @@ jobs:
           base: ${{ github.event.inputs.upstream_branch }}
           head: ${{ github.event.inputs.branch }}
           auto_approve: true
+          ignore_fail: false
           personal_token: ${{ secrets.GH_PERSONAL_TOKEN }}  
