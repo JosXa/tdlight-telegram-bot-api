@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: tgymnich/fork-sync@v1.2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
           owner: ${{ github.event.inputs.upstream_owner }}
           base: ${{ github.event.inputs.upstream_branch }}
           head: ${{ github.event.inputs.branch }}
