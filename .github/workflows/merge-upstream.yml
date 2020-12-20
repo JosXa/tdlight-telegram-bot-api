@@ -1,4 +1,4 @@
-name: Scheduled Merge Remote Action
+name: Merge Upstream
 on: 
   schedule:
     - cron: '0 0,6,12,18 * * *'
