@@ -4,14 +4,18 @@ on:
     - cron: '0 0,6,12,18 * * *'
   workflow_dispatch:
     inputs:
-      upstream_branch:
-        description: 'Upstream ref'
+      upstream:
+        description: 'Upstream repository owner/name. Eg. exions/merge-upstream'
         required: true
-        default: 'upstream/user-methods'
-      merge_into_ref:
-        description: 'Ref to merge into'
-        required: false
-        default: 'master'
+        default: 'code1mountain/tdlight-telegram-bot-api'       # set the upstream repo
+      upstream-branch:
+        description: 'Upstream branch to merge from. Eg. master'
+        required: true
+        default: 'user-methods'           # set the upstream branch to merge from
+      branch:
+        description: 'Branch to merge to'
+        required: true
+        default: 'master'         # set the branch to merge to
 
 jobs:
   merge-upstream:
@@ -20,11 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.inputs.merge_into_ref }}          # set the branch to merge to
+          ref: ${{ github.event.inputs.branch }}
           fetch-depth: 0 
       - name: Merge Upstream
         uses: exions/merge-upstream@v1
         with:
-          upstream: code1mountain/tdlight-telegram-bot-api
-          upstream-branch: ${{ github.event.inputs.upstream_branch }}
-          branch: upstream
+          upstream: ${{ github.event.inputs.upstream }}
+          upstream-branch: ${{ github.event.inputs.upstream-branch }}
+          branch: ${{ github.event.inputs.branch }}
